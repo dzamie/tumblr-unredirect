@@ -1,0 +1,28 @@
+// ==UserScript==
+// @name        Tumblr Redirect Remover
+// @author      dzamie
+// @namespace   github.com/dzamie
+// @description tumblr redirects are slow and probably tracking you. Let's get rid of them.
+// @match       *://*.tumblr.com/*
+// @match       *://tumblr.com/*
+// @version     2020.06.08
+// @grant       none
+// @run-at      document-idle
+// ==/UserScript==
+
+console.log('Started Tumblr Redirect Remover...');
+
+// Grab all links on the page, look only at redirects, not internal links
+var links = Array.from(document.querySelectorAll("a[href]"));
+var redirs = links.filter(function(x) { return x["href"].includes("t.umblr.com/redirect"); });
+
+redirs.forEach(function(link) {
+  let url = link["href"];
+  // tumblr redirect finds the t variable first, after the URL
+  let endslice = url.lastIndexOf("&t=");
+  // tumblr redirect uses z for the URL, +2 puts the index after the =
+  let startslice = url.indexOf("z=") + 2;
+  link["href"] = decodeURIComponent(url.slice(startslice,endslice))
+});
+
+console.log('Finished Tumblr Redirect Remover.');
